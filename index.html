@@ -1,0 +1,234 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bio-Composite Tile Experiment</title>
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #eef5f9;
+  color: #183047;
+}
+header {
+  background: #123b56;
+  color: white;
+  padding: 25px 18px;
+  text-align: center;
+}
+main {
+  max-width: 1000px;
+  margin: auto;
+  padding: 20px;
+}
+section {
+  background: white;
+  padding: 20px;
+  margin: 18px 0;
+  border-radius: 14px;
+  box-shadow: 0 3px 12px #0001;
+}
+h2 { color: #17647a; }
+.graph {
+  display: flex;
+  gap: 24px;
+  align-items: end;
+  justify-content: center;
+  height: 220px;
+  border-bottom: 2px solid #183047;
+  padding: 15px;
+}
+.barbox {
+  width: 38%;
+  text-align: center;
+}
+.bar {
+  width: 100%;
+  border-radius: 8px 8px 0 0;
+  padding-top: 12px;
+  box-sizing: border-box;
+  color: white;
+  font-weight: bold;
+}
+.control { height: 145px; background: #1768a3; }
+.tile { height: 145px; background: #279b78; }
+.note { font-size: 14px; color: #526577; }
+.model-area {
+  height: 360px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #e7f2f7;
+  border-radius: 12px;
+  cursor: grab;
+  perspective: 800px;
+  touch-action: pan-y;
+}
+.model-area:active { cursor: grabbing; }
+.model {
+  position: relative;
+  width: 250px;
+  height: 200px;
+  transform-style: preserve-3d;
+  transform: rotateX(-20deg) rotateY(-30deg);
+}
+.layer {
+  position: absolute;
+  width: 250px;
+  height: 200px;
+  box-sizing: border-box;
+  border: 2px solid #6f563c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-weight: bold;
+  opacity: .96;
+}
+.soil {
+  background: #b88a59;
+  transform: translateZ(-20px);
+}
+.road {
+  height: 45px;
+  background: #525b63;
+  color: white;
+  transform: translateY(-100px) translateZ(30px);
+}
+.tile3d {
+  height: 28px;
+  background: #d5c68c;
+  color: #382d18;
+  border: 3px solid #655331;
+  transform: translateY(30px) translateZ(35px);
+}
+.front {
+  width: 250px;
+  height: 200px;
+  background: #c49a6c;
+  transform: translateZ(60px);
+  opacity: .88;
+}
+.labels {
+  position: absolute;
+  top: 210px;
+  width: 300px;
+  left: -25px;
+  text-align: center;
+  color: #183047;
+  font-size: 13px;
+  transform: translateZ(80px);
+}
+button {
+  padding: 10px 16px;
+  background: #17647a;
+  color: white;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  margin: 5px;
+}
+footer { text-align: center; padding: 20px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Multi-Waste Polyphenol Bio-Composite Mat</h1>
+  <p>Exploring waste-based materials for soil and water protection in Qatar</p>
+</header>
+
+<main>
+<section>
+  <h2>1. Experimental observations</h2>
+  <p>Blue food-colouring water was poured through two sand setups.</p>
+  <div class="graph">
+    <div class="barbox">
+      <div class="bar control">Dark blue</div>
+      <p>Control: bare sand</p>
+    </div>
+    <div class="barbox">
+      <div class="bar tile">Almost clear</div>
+      <p>Sand + bio-composite tile</p>
+    </div>
+  </div>
+  <p class="note">
+    Qualitative observations only; bar heights are illustrative, not measured scores.
+    Food colouring is not a heavy metal, so this test does not prove heavy-metal removal.
+  </p>
+</section>
+
+<section>
+  <h2>2. Explore the underground model</h2>
+  <p>Drag the model left, right, up or down to change its viewing angle.</p>
+  <div class="model-area" id="area">
+    <div class="model" id="model">
+      <div class="layer soil">Soil layer</div>
+      <div class="layer front">Underground soil</div>
+      <div class="layer road">ROAD SURFACE</div>
+      <div class="layer tile3d">BIO-COMPOSITE TILE</div>
+      <div class="labels">Illustrative concept — not to scale</div>
+    </div>
+  </div>
+  <p class="note">
+    Concept model showing where a tile might be placed. It does not represent
+    a tested roadside installation.
+  </p>
+  <button onclick="resetModel()">Reset model view</button>
+</section>
+
+<section>
+  <h2>3. Materials used</h2>
+  <ul>
+    <li>Spent coffee grounds</li>
+    <li>Black tea waste</li>
+    <li>Processed date palm leaves</li>
+    <li>Cornstarch binder</li>
+  </ul>
+  <p>
+    The project investigates whether locally available waste materials can
+    be reused in an environmentally useful composite.
+  </p>
+</section>
+</main>
+
+<footer>Student science project | Qatar</footer>
+
+<script>
+const area = document.getElementById("area");
+const model = document.getElementById("model");
+let rx = -20, ry = -30;
+let dragging = false, lastX = 0, lastY = 0;
+
+area.addEventListener("pointerdown", e => {
+  dragging = true;
+  lastX = e.clientX;
+  lastY = e.clientY;
+  area.setPointerCapture(e.pointerId);
+});
+area.addEventListener("pointermove", e => {
+  if (!dragging) return;
+  ry += (e.clientX - lastX) * 0.7;
+  rx -= (e.clientY - lastY) * 0.5;
+  rx = Math.max(-75, Math.min(75, rx));
+  lastX = e.clientX;
+  lastY = e.clientY;
+  updateModel();
+});
+area.addEventListener("pointerup", () => dragging = false);
+area.addEventListener("pointercancel", () => dragging = false);
+
+function updateModel() {
+  model.style.transform =
+    `rotateX(${rx}deg) rotateY(${ry}deg)`;
+}
+function resetModel() {
+  rx = -20;
+  ry = -30;
+  updateModel();
+}
+</script>
+</body>
+</html>
